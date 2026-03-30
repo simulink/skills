@@ -37,8 +37,9 @@ in = in.setVariable('Kp', 1.2);
 Pass input signals through Inport blocks using a `Simulink.SimulationData.Dataset`. Each timeseries `Name` must match the corresponding Inport block's signal name, otherwise the signal won't be routed correctly.
 
 ```matlab
-dt = 0.01;
-t = dt*(0:1000)';
+dt = 0.01; % sample time
+N = 1000; % Number of points
+t = dt*(0:N)';
 u = sin(2*pi*t);
 
 ts = timeseries(u, t);
