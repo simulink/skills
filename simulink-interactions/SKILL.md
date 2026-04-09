@@ -109,7 +109,7 @@ gap = 50;
 setBlockPosition(newBlk, refX + refW + gap, refY);
 
 % 4. Connect it
-Simulink.connectBlocks(gcs, refBlk, newBlk);
+Simulink.connectBlocks(Source,Destination);
 ```
 
 Common built-in library paths:
