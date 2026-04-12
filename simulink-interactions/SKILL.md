@@ -50,6 +50,7 @@ Use `get_param` to read current state before making changes. This helps you conf
 
 ```matlab
 get_param(gcb, 'Gain')           % read a specific parameter
+get_param(gcb,'DialogParameters')  % list all dialog parameters
 get_param(gcb, 'ObjectParameters') % list all available parameters
 ```
 
