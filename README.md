@@ -1,6 +1,6 @@
-# Simulink AI Skills and Coding Rules by Guy on Simulink
+# AI coding agents skills for Simulink by Guy on Simulink
 
-A collection of skills for [Claude code](https://code.claude.com/docs/en/overview) or [Amp](https://ampcode.com) by [Guy on Simulink](https://blogs.mathworks.com/simulink/).
+A collection of skills for AI coding agents by [Guy on Simulink](https://blogs.mathworks.com/simulink/).
 
 The skills are designed to guide AI agents to interact with Simulink models programmatically via the [MATLAB MCP server](https://github.com/mathworks/matlab-mcp). These skills encode best practices and guard against common pitfalls so the agent produces correct MATLAB/Simulink code on the first try.
 
