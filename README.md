@@ -48,6 +48,26 @@ Key conventions enforced:
 - Smart teardown with `bdIsLoaded` check
 - Include a static `generateBaseline()` method for easy re-baselining
 
+### Profiling Skills
+
+#### `simulink-profile-initialization`
+
+Profile and analyze the initialization (compile) phase of a Simulink model. Collects timing metadata, Performance Tracer data, and MATLAB Profiler results, then generates interactive HTML flamegraph reports highlighting user-actionable bottlenecks.
+
+**Triggers on:** "profile model initialization", "why is my model slow to compile", or when existing profiling files (`out_after.mat`, `perfTracer.mat`, `profilerResults.mat`) are provided.
+
+#### `simulink-profiler-analyzer`
+
+Analyze Simulink Profiler data to find simulation-time bottlenecks, or compare two profiler sessions side-by-side to pinpoint performance regressions between releases or design changes.
+
+**Triggers on:** "profile this model", "find what is slow", "compare profiler sessions", or when a `Simulink.profiler.Data` variable or MAT-file is provided.
+
+#### `simulink-solver-profiler-analyzer`
+
+Run the Simulink Solver Profiler and interpret the results — solver resets, exceptions, zero crossings, Jacobian updates, and algebraic loops — with prioritized recommendations and a standalone HTML report.
+
+**Triggers on:** "run the solver profiler", "diagnose solver issues", or when solver profiler session data is provided.
+
 ## Prerequisites
 
 - **MATLAB** with **Simulink** (and **Simulink Test** for the baseline-test skill)
