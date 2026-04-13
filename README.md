@@ -1,4 +1,4 @@
-# AI coding agents skills for Simulink by Guy on Simulink
+# Agentic coding agents skills by Guy on Simulink
 
 A collection of skills for AI coding agents by [Guy on Simulink](https://blogs.mathworks.com/simulink/).
 
