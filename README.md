@@ -71,8 +71,8 @@ Run the Simulink Solver Profiler and interpret the results — solver resets, ex
 ## Prerequisites
 
 - **MATLAB** with **Simulink** (and **Simulink Test** for the baseline-test skill)
-- The [MATLAB MCP server](https://github.com/mathworks/matlab-mcp) configured in your Amp environment
-- [Claude code](https://code.claude.com/docs/en/overview) or [Amp](https://ampcode.com) CLI or IDE extension
+- The [MATLAB MCP server](https://github.com/mathworks/matlab-mcp) configured in your agentic coding tool environment
+- An agentic coding tool: [Claude code](https://code.claude.com/docs/en/overview), [Sourcegraph Amp](https://ampcode.com), [GitHub® Copilot](https://github.com/features/copilot), [Cursor](https://www.cursor.com/), [OpenAI® Codex](https://openai.com/codex), [Gemini™ CLI](https://github.com/google-gemini/gemini-cli)
 
 ## Installation
 
