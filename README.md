@@ -78,10 +78,17 @@ Run the Simulink Solver Profiler and interpret the results — solver resets, ex
 
 ### Option 1 — Project-level (recommended)
 
-Copy the skill folders you need into your project's `.amp/skills/` directory:
+Copy the skill folders you need into your project's skills directory. The location depends on your coding agent:
+
+| Agent | Skills directory |
+|---|---|
+| Amp | `.amp/skills/` |
+| Claude Code | `.claude/skills/` |
+| Cursor | `.cursor/skills/` |
+| Other agents | Check your agent's documentation |
 
 ```
-.amp/skills/
+<skills-directory>/
 ├── simulink-interactions/
 │   ├── SKILL.md
 │   └── utils/
@@ -95,10 +102,11 @@ Copy the skill folders you need into your project's `.amp/skills/` directory:
 
 Copy the skill folders into your global skills directory:
 
-| OS | Path |
-|---|---|
-| Windows | `%USERPROFILE%\.amp\skills\` |
-| macOS / Linux | `~/.amp/skills/` |
+| Agent | Windows | macOS / Linux |
+|---|---|---|
+| Amp | `%USERPROFILE%\.amp\skills\` | `~/.amp/skills/` |
+| Claude Code | `%USERPROFILE%\.claude\skills\` | `~/.claude/skills/` |
+| Cursor | `%USERPROFILE%\.cursor\skills\` | `~/.cursor/skills/` |
 
 ## Usage
 
