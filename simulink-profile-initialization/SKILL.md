@@ -17,15 +17,14 @@ You are an expert in profiling and analyzing the initialization (compile) phase 
 
 ## Setup
 
-Before running any analysis scripts, the skill's scripts/ folder must be added to the MATLAB path.
-
-**Instructions for the AI Agent:**
-Do not hardcode paths to specific agents or operating systems (like .config/amp or USERPROFILE). Instead, dynamically determine the absolute path to this skill's directory (the folder containing this SKILL.md file), append scripts, and add it to the MATLAB path.
+Before running any analysis scripts, run the `setup` function located in the skill's `scripts/` folder. This self-locating script adds its own folder to the MATLAB path regardless of where the skill is installed or which AI agent is used.
 
 ```matlab
-% The agent must replace ABSOLUTE_PATH_TO_SKILL_DIRECTORY with the actual path
-addpath(fullfile('ABSOLUTE_PATH_TO_SKILL_DIRECTORY', 'scripts'));
+run('SCRIPTS_FOLDER/setup.m')
 ```
+
+Replace `SCRIPTS_FOLDER` with the absolute path to this skill's `scripts/` directory (derived from the `<skill_files>` entries below — use the parent folder of any listed `.m` file).
+
 This makes the following functions available:
 - `collectInitProfiling` — run the profiling harness on a loaded model
 - `analyzeTimingOverview` — display timing breakdown from SimulationOutput

@@ -22,13 +22,13 @@ When the user asks you to analyze a model or a session file, follow these steps:
 
 ### Step 0 — Setup
 
-Use `mcp__matlab__evaluate_matlab_code` to add the **stringify** folder to the MATLAB path. The absolute path to this folder is listed in the `<skill_files>` section at the bottom of this skill — look for any `.m` file path under the `stringify` directory and use its parent folder. For example:
+Run the `setup` function located in the skill's `stringify/` folder. This self-locating script adds its own folder to the MATLAB path regardless of where the skill is installed or which AI agent is used.
 
 ```matlab
-addpath('STRINGIFY_FOLDER_PATH');
+run('STRINGIFY_FOLDER/setup.m')
 ```
 
-Replace `STRINGIFY_FOLDER_PATH` with the actual absolute path derived from the `<skill_files>` entries (e.g., if a skill file is listed as `/home/user/skills/simulink-solver-profiler-analyzer/stringify/utilGetStatisticsText.m`, use `/home/user/skills/simulink-solver-profiler-analyzer/stringify`).
+Replace `STRINGIFY_FOLDER` with the absolute path to this skill's `stringify/` directory (derived from the `<skill_files>` entries below — use the parent folder of any listed `.m` file).
 
 This is required for all three data acquisition options below.
 

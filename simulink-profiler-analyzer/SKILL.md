@@ -18,13 +18,13 @@ You are an expert at analyzing Simulink Profiler data. You help users identify s
 
 ## Setup
 
-Before any analysis, add the skill's scripts folder to the MATLAB path:
+Before any analysis, run the `setup` function located in the skill's `scripts/` folder. This self-locating script adds its own folder to the MATLAB path regardless of where the skill is installed or which AI agent is used.
 
 ```matlab
-addpath(fullfile(getenv('USERPROFILE'), '.config', 'amp', 'skills', 'simulink-profiler-analyzer', 'scripts'));
+run('SCRIPTS_FOLDER/setup.m')
 ```
 
-On macOS/Linux, replace `USERPROFILE` with `HOME`.
+Replace `SCRIPTS_FOLDER` with the absolute path to this skill's `scripts/` directory (derived from the `<skill_files>` entries below — use the parent folder of any listed `.m` file).
 
 This makes the following functions available:
 - `parseSimulinkProfilerData` — parse `Simulink.profiler.Data` into structured tables
