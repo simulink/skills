@@ -87,16 +87,6 @@ Copy the skill folders you need into your project's skills directory. The locati
 | Cursor | `.cursor/skills/` |
 | Other agents | Check your agent's documentation |
 
-```
-<skills-directory>/
-├── simulink-interactions/
-│   ├── SKILL.md
-│   └── utils/
-├── simulink-simulation/
-│   └── SKILL.md
-└── simulink-baseline-test/
-    └── SKILL.md
-```
 
 ### Option 2 — User-level (available in all projects)
 
