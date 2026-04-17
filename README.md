@@ -2,7 +2,7 @@
 
 A collection of skills for AI coding agents by [Guy on Simulink](https://blogs.mathworks.com/simulink/).
 
-Skills in this repository are designed to work with the [Simulink Agentic Toolkit](https://github.com/simulink/simulink-agentic-toolkit). Make sure you install the Simulink Agentic Toolkit before using skills from this repository. The skills in this repository povide additional functionalities for specialized workflows that are not included in th Simulink Agentic Toolkit.
+Skills in this repository are designed to work with the [Simulink Agentic Toolkit](https://github.com/simulink/simulink-agentic-toolkit). Make sure you install the Simulink Agentic Toolkit before using skills from this repository. The skills in this repository povide additional functionalities for specialized workflows that are not included in the Simulink Agentic Toolkit.
 
 **Disclaimer:** *This set of skills is not an official MathWorks product and might not be appropriate for all users and use cases. They are useful for me, for the kind of code and Simulink models I publish on [Guy on Simulink](https://blogs.mathworks.com/simulink/). As the disclaimer on the blog says: These postings are the author's and don't necessarily represent the opinions of MathWorks.*
 
