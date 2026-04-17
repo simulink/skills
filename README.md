@@ -2,9 +2,7 @@
 
 A collection of skills for AI coding agents by [Guy on Simulink](https://blogs.mathworks.com/simulink/).
 
-The skills are designed to guide AI agents to interact with Simulink models programmatically via the [MATLAB MCP server](https://github.com/mathworks/matlab-mcp). These skills encode best practices and guard against common pitfalls so the agent produces correct MATLAB/Simulink code on the first try.
-
-More specifically, they force the agent to generate code that uses what I consider modern best practices and that keeps the code short and simple.
+Skills in this repository are designed to work with the [Simulink Agentic Toolkit](https://github.com/simulink/simulink-agentic-toolkit). Make sure you install the Simulink Agentic Toolkit before using skills from this repository. The skills in this repository povide additional functionalities for specialized workflows that are not included in th Simulink Agentic Toolkit.
 
 **Disclaimer:** *This set of skills is not an official MathWorks product and might not be appropriate for all users and use cases. They are useful for me, for the kind of code and Simulink models I publish on [Guy on Simulink](https://blogs.mathworks.com/simulink/). As the disclaimer on the blog says: These postings are the author's and don't necessarily represent the opinions of MathWorks.*
 
@@ -114,6 +112,7 @@ Once installed, skills are activated automatically when your prompt matches thei
 
 *   [MATLAB](https://www.mathworks.com/products/matlab.html)
 *   [Simulink](https://www.mathworks.com/products/simulink.html)
+*   [Simulink Agentic Toolkit](https://github.com/simulink/simulink-agentic-toolkit)
 
 ### License
 
