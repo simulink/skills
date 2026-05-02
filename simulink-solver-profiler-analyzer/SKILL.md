@@ -233,7 +233,7 @@ Use the Simscape state mapping obtained in Step 3 to render state paths as click
 
 ### Additional Best Practices
 
-IMPORTANT: I recommend addressing solver resets first. They are usually easier to fix by doing:
+IMPORTANT: Address solver resets first. They are usually easier to fix by doing:
 - If the sample time of the incoming signal is fixed-step discrete (D1, D2): Use a First Order Hold block
 - If the sample time of the incoming signal is Fixed-In-Minor: Check if you broke an algebraic loop using a Memory block. Use a Transfer Function instead. See this article for details: https://blogs.mathworks.com/simulink/2015/07/18/why-you-should-never-break-an-algebraic-loop-with-with-a-memory-block/
 
