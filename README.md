@@ -43,7 +43,7 @@ Run the Simulink Solver Profiler and interpret the results — solver resets, ex
 
 ## Prerequisites
 
-- **MATLAB** with **Simulink** (and **Simulink Test** for the baseline-test skill)
+- **MATLAB** with **Simulink**
 - The [MATLAB MCP server](https://github.com/matlab/matlab-mcp-core-server) configured in your agentic coding tool environment
 - An agentic coding tool: [Claude Code](https://code.claude.com/docs/en/overview), [Sourcegraph Amp](https://ampcode.com), [GitHub® Copilot](https://github.com/features/copilot), [Cursor](https://www.cursor.com/), [OpenAI® Codex](https://openai.com/codex), [Gemini™ CLI](https://github.com/google-gemini/gemini-cli)
 
@@ -76,11 +76,11 @@ Copy the skill folders into your global skills directory:
 Once installed, skills are activated automatically when your prompt matches their trigger description. You can also invoke them explicitly:
 
 ```
-> Use the simulink-simulation skill to sweep the gain from 1 to 10 and plot the step response for each value.
+> Use the simulink-interactions skill to color all Gain blocks red.
 ```
 
 ```
-> Use the simulink-baseline-test skill to create a regression test for this model.
+> Use the simulink-profiler-analyzer skill to find what is slow in this model.
 ```
 
 ### MathWorks Products (https://www.mathworks.com)
