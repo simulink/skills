@@ -1,10 +1,10 @@
 # Simulink skills for agentic coding tools by Guy on Simulink
 
-A collection of skills for AI coding agents by [Guy on Simulink](https://blogs.mathworks.com/simulink/).
+A collection of skills for AI coding agents by [Guy on Simulink].
 
-Skills in this repository are designed to work with the [Simulink Agentic Toolkit](https://github.com/simulink/simulink-agentic-toolkit). Make sure you install the Simulink Agentic Toolkit before using skills from this repository. The skills in this repository povide additional functionalities for specialized workflows that are not included in the Simulink Agentic Toolkit.
+Skills in this repository are designed to work with the [Simulink Agentic Toolkit]. Make sure you install the Simulink Agentic Toolkit before using skills from this repository. The skills in this repository provide additional functionalities for specialized workflows that are not included in the Simulink Agentic Toolkit.
 
-**Disclaimer:** *This set of skills is not an official MathWorks product and might not be appropriate for all users and use cases. They are useful for me, for the kind of code and Simulink models I publish on [Guy on Simulink](https://blogs.mathworks.com/simulink/). As the disclaimer on the blog says: These postings are the author's and don't necessarily represent the opinions of MathWorks.*
+**Disclaimer:** *This set of skills is not an official MathWorks product and might not be appropriate for all users and use cases. They are useful for me, for the kind of code and Simulink models I publish on [Guy on Simulink]. As the disclaimer on the blog says: These postings are the author's and don't necessarily represent the opinions of MathWorks.*
 
 
 ## Skills
@@ -20,31 +20,6 @@ Key conventions enforced:
 - Use `Simulink.connectBlocks` instead of `add_line`
 - Position blocks with bundled `setBlockPosition` / `setBlockDimensions` utilities — never raw `'Position'` vectors
 - Log signals via port handles — never To Workspace blocks
-
-### `simulink-simulation`
-
-Run simulations the right way using the `Simulink.SimulationInput` / `SimulationOutput` API.
-
-**Triggers on:** any request involving `sim()`, `SimulationInput`, `logsout`, `setExternalInput`, parameter sweeps, or `parsim`.
-
-Key conventions enforced:
-- Always drive simulations through `SimulationInput` — never bare `set_param` + `sim`
-- Pass inputs via `Simulink.SimulationData.Dataset` with correctly named timeseries
-- Discover logged signal names before accessing them
-- Use `parsim` for batch / parallel runs
-
-### `simulink-baseline-test`
-
-Generate a MATLAB baseline (golden-reference) regression test for a Simulink model using `sltest.TestCase` and `verifySignalsMatch`.
-
-**Triggers on:** "create a baseline test", "golden-reference test", or "regression test" for a Simulink model.
-
-Key conventions enforced:
-- Inherit from `sltest.TestCase`, not `matlab.unittest.TestCase`
-- Simulate once, compare all signals in a single `verifySignalsMatch` call
-- Use `RelTol` / `AbsTol` directly — no manual scaling
-- Smart teardown with `bdIsLoaded` check
-- Include a static `generateBaseline()` method for easy re-baselining
 
 ### Profiling Skills
 
@@ -68,9 +43,9 @@ Run the Simulink Solver Profiler and interpret the results — solver resets, ex
 
 ## Prerequisites
 
-- **MATLAB** with **Simulink** (and **Simulink Test** for the baseline-test skill)
-- The [MATLAB MCP server](https://github.com/mathworks/matlab-mcp) configured in your agentic coding tool environment
-- An agentic coding tool: [Claude code](https://code.claude.com/docs/en/overview), [Sourcegraph Amp](https://ampcode.com), [GitHub® Copilot](https://github.com/features/copilot), [Cursor](https://www.cursor.com/), [OpenAI® Codex](https://openai.com/codex), [Gemini™ CLI](https://github.com/google-gemini/gemini-cli)
+- **MATLAB** with **Simulink**
+- The [MATLAB MCP server](https://github.com/matlab/matlab-mcp-core-server) configured in your agentic coding tool environment
+- An agentic coding tool: [Claude Code](https://code.claude.com/docs/en/overview), [Sourcegraph Amp](https://ampcode.com), [GitHub® Copilot](https://github.com/features/copilot), [Cursor](https://www.cursor.com/), [OpenAI® Codex](https://openai.com/codex), [Gemini™ CLI](https://github.com/google-gemini/gemini-cli)
 
 ## Installation
 
@@ -101,25 +76,28 @@ Copy the skill folders into your global skills directory:
 Once installed, skills are activated automatically when your prompt matches their trigger description. You can also invoke them explicitly:
 
 ```
-> Use the simulink-simulation skill to sweep the gain from 1 to 10 and plot the step response for each value.
+> Use the simulink-interactions skill to color all Gain blocks red.
 ```
 
 ```
-> Use the simulink-baseline-test skill to create a regression test for this model.
+> Use the simulink-profiler-analyzer skill to find what is slow in this model.
 ```
 
 ### MathWorks Products (https://www.mathworks.com)
 
 *   [MATLAB](https://www.mathworks.com/products/matlab.html)
 *   [Simulink](https://www.mathworks.com/products/simulink.html)
-*   [Simulink Agentic Toolkit](https://github.com/simulink/simulink-agentic-toolkit)
+*   [Simulink Agentic Toolkit]
 
 ### License
 
-The license is available in the License.txt file in this GitHub repository.
+The license is available in the license.txt file in this GitHub repository.
 
 ### Community Support
 
 [MATLAB Central](https://www.mathworks.com/matlabcentral)
 
 Copyright 2026 The MathWorks, Inc.
+
+[Guy on Simulink]: https://blogs.mathworks.com/simulink/
+[Simulink Agentic Toolkit]: https://github.com/matlab/simulink-agentic-toolkit
