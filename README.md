@@ -21,6 +21,12 @@ Key conventions enforced:
 - Position blocks with bundled `setBlockPosition` / `setBlockDimensions` utilities — never raw `'Position'` vectors
 - Log signals via port handles — never To Workspace blocks
 
+### `simulink-debug-commandline`
+
+Debug Simulink simulation results at the engine method level using the command-line debugger (`sldebug`). Steps through individual block methods (Outputs, Update, Derivatives, InitializeConditions, Enable, Disable) to pinpoint exactly why a block produces an unexpected value at a specific time step.
+
+**Triggers on:** "output is wrong at this time step", "block produces unexpected value", "state resets unexpectedly", "debug block execution", "what happens at t=X", "step through the simulation loop", "use sldebug", "probe block data", "trace block I/O", "debug block methods".
+
 ### Profiling Skills
 
 #### `simulink-profile-initialization`
