@@ -16,11 +16,21 @@ function collectInitProfiling(mdl)
         mdl = bdroot;
     end
 
-    % Detect model references before profiling
+    % Detect model references and their simulation modes
     [~, mdlRefs] = find_mdlrefs(mdl, 'ReturnTopModelAsLastElement', false);
     hasModelRefs = ~isempty(mdlRefs);
     modelInfo.hasModelRefs = hasModelRefs;
     modelInfo.modelRefRebuild = get_param(mdl, 'UpdateModelReferenceTargets');
+    if hasModelRefs
+        refModels = struct('blockPath', {}, 'modelName', {}, 'simMode', {});
+        for k = 1:numel(mdlRefs)
+            blkPath = mdlRefs{k};
+            refModels(k).blockPath = blkPath;
+            refModels(k).modelName = get_param(blkPath, 'ModelName');
+            refModels(k).simMode = get_param(blkPath, 'SimulationMode');
+        end
+        modelInfo.refModels = refModels;
+    end
     save modelRefInfo modelInfo
 
     PerfTools.Tracer.enable('All Simulink Compile', true);
