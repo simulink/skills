@@ -29,8 +29,10 @@ function [userFuncs, shipFuncs, userTotal, shipTotal] = parseProfilerData(matFil
     totalTime = [ft.TotalTime]';
     numCalls = [ft.NumCalls]';
     isShipping = false(N, 1);
+    isHarness = false(N, 1);
 
     for i = 1:N
+        isHarness(i) = strcmp(ft(i).FunctionName, 'collectInitProfiling');
         isShipping(i) = startsWith(ft(i).FileName, mr, 'IgnoreCase', true) || isempty(ft(i).FileName);
         childTime = 0;
         if ~isempty(ft(i).Children)
@@ -46,7 +48,7 @@ function [userFuncs, shipFuncs, userTotal, shipTotal] = parseProfilerData(matFil
     k = 0;
     for j = 1:N
         i = idxSelf(j);
-        if ~isShipping(i)
+        if ~isShipping(i) && ~isHarness(i)
             k = k + 1;
             userFuncs(k).rank = k; %#ok<AGROW>
             userFuncs(k).name = ft(i).FunctionName;
@@ -63,7 +65,7 @@ function [userFuncs, shipFuncs, userTotal, shipTotal] = parseProfilerData(matFil
     k = 0;
     for j = 1:N
         i = idxSelf(j);
-        if isShipping(i)
+        if isShipping(i) && ~isHarness(i)
             k = k + 1;
             [~, fname, ext] = fileparts(ft(i).FileName);
             shipFuncs(k).rank = k; %#ok<AGROW>
@@ -76,7 +78,7 @@ function [userFuncs, shipFuncs, userTotal, shipTotal] = parseProfilerData(matFil
         end
     end
 
-    % Totals
-    userTotal = sum(selfTime(~isShipping));
-    shipTotal = sum(selfTime(isShipping));
+    % Totals (exclude harness)
+    userTotal = sum(selfTime(~isShipping & ~isHarness));
+    shipTotal = sum(selfTime(isShipping & ~isHarness));
 end

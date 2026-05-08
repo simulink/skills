@@ -84,13 +84,22 @@
 <body>
 <div class="container">
 
-  <h1>🔍 Initialization Profiling Report</h1>
+  <h1>Initialization Profiling Report — {{MODEL_NAME}}</h1>
   <p class="subtitle">Compile-phase profiling &amp; bottleneck analysis &mdash; Generated: {{DATE}}</p>
 
-  <!-- ============ SUMMARY ============ -->
-  <div class="summary-grid">
-    {{SUMMARY_ITEMS}}
+  {{ERROR_SECTION}}
+
+  <div class="card" style="margin-bottom:1.5rem;">
+    <p>This report provides a detailed breakdown of the time spent during Simulink model initialization (compilation). Results are organized into three categories to guide optimization efforts:</p>
+    <ol style="margin:0.5rem 0 0.5rem 1.5rem;">
+      <li style="margin-bottom:0.4rem;"><strong>Simulink compile phases</strong> &mdash; Time spent in each internal engine phase. Disproportionately large leaf phases are flagged as potential bottlenecks. Depending on the phases identified, targeted modifications to the model structure or configuration can lead to measurable improvements.</li>
+      <li style="margin-bottom:0.4rem;"><strong>User MATLAB code</strong> &mdash; Time spent in user-authored callbacks and scripts (e.g., InitFcn, PreLoadFcn). This is the most actionable category for reducing initialization time. If significant time is spent here, the MATLAB Profiler can be used for further analysis to pinpoint specific lines of code to optimize.</li>
+      <li style="margin-bottom:0.4rem;"><strong>MathWorks MATLAB code</strong> &mdash; Time spent in MathWorks shipping code. Typically not user-actionable, but significant contributions may merit further investigation with MathWorks support.</li>
+    </ol>
   </div>
+
+  <!-- ============ FINDINGS & RECOMMENDATIONS ============ -->
+  {{FINDINGS_SECTION}}
 
   <!-- ============ MODEL INFORMATION ============ -->
   <h2>Model Information</h2>
@@ -101,7 +110,7 @@
   </div>
 
   <!-- ============ FLAMEGRAPH ============ -->
-  <h2>🔥 Compile Phase Flamegraph</h2>
+  <h2>Simulink Compile Phases Flamegraph</h2>
   <div class="flame-section">
     <h3>Interactive — click a bar to zoom in, use Reset or breadcrumbs to zoom out</h3>
     <div class="flame-toolbar">
@@ -113,7 +122,7 @@
   <div class="tooltip" id="tooltip"></div>
 
   <!-- ============ TOP PHASES TABLE ============ -->
-  <h2><span class="badge badge-red">Critical</span> Top Compile Phases by Duration</h2>
+  <h2>{{PHASE_BADGE}} Simulink Top Compile Phases by Duration</h2>
   <div class="card">
     <p style="margin-bottom:0.5rem;color:var(--muted);font-size:0.88rem;">Phases with ≥0.5% of total wall time ({{TOTAL_TIME}} s). See flamegraph above for nested hierarchy.</p>
     <table>
@@ -125,7 +134,7 @@
   </div>
 
   <!-- ============ USER PROFILER ============ -->
-  <h2><span class="badge badge-red">Critical</span> User Code Bottlenecks</h2>
+  <h2>{{USER_BADGE}} MATLAB Code: User</h2>
 
   <!-- Profiler flamegraph (user code only) -->
   <div class="flame-section">
@@ -149,7 +158,7 @@
   </div>
 
   <!-- ============ SHIPPING PROFILER ============ -->
-  <h2><span class="badge badge-yellow">Warning</span> Shipping Code Hot Spots</h2>
+  <h2>{{SHIP_BADGE}} MATLAB Code: MathWorks</h2>
   <div class="card">
     <details>
       <summary>Top 20 MathWorks-internal functions by self-time (for awareness)</summary>
@@ -163,7 +172,6 @@
   </div>
 
   <!-- ============ MODEL REF REBUILD ============ -->
-  <h2><span class="badge badge-yellow">Warning</span> ModelRefRebuild Setting</h2>
   {{MRR_SECTION}}
 
   <div class="footer">

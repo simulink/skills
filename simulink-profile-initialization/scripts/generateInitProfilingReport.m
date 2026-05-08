@@ -20,6 +20,8 @@ function generateInitProfilingReport(dataDir, outFile)
     timing.total  = ti.TotalElapsedWallTime;
     timing.tstart = ti.WallClockTimestampStart;
     timing.tstop  = ti.WallClockTimestampStop;
+    modelName = S.out.SimulationMetadata.ModelInfo.ModelName;
+    errorMsg = S.out.ErrorMessage;
 
     % --- 2. Performance Tracer phases + flamegraph JSON ---
     [phases, flamegraphJson, perfTotalWall] = parsePerfTracerData(fullfile(dataDir, 'perfTracer.mat'));
@@ -28,20 +30,20 @@ function generateInitProfilingReport(dataDir, outFile)
     [userFuncs, shipFuncs, userTotal, shipTotal] = parseProfilerData(fullfile(dataDir, 'profilerResults.mat'), 20);
     profilerFlamegraphJson = buildProfilerFlamegraph(fullfile(dataDir, 'profilerResults.mat'));
 
-    % --- 4. ModelRefRebuild setting ---
-    [mrrVal, mrrStatus] = parseModelRefRebuild(fullfile(dataDir, 'modelCompileDiary.txt'));
+    % --- 4. ModelRefRebuild setting + model reference detection ---
+    [mrrVal, mrrStatus, hasModelRefs] = parseModelRefInfo(dataDir);
 
     % --- Build HTML ---
     skillDir = fileparts(mfilename('fullpath'));
     templateFile = fullfile(skillDir, '..', 'reference', 'init_profiling_template.html');
     html = fileread(templateFile);
 
-    % Summary items
-    summaryHtml = buildSummaryItems(timing, userTotal, shipTotal);
-    html = strrep(html, '{{SUMMARY_ITEMS}}', summaryHtml);
+    % Findings
+    findingsHtml = buildFindingsSection(timing, phases, perfTotalWall, userFuncs, userTotal, shipTotal, mrrVal, mrrStatus, hasModelRefs);
+    html = strrep(html, '{{FINDINGS_SECTION}}', findingsHtml);
 
     % Model info
-    modelInfoHtml = buildModelInfoRows(timing, mrrVal, mrrStatus);
+    modelInfoHtml = buildModelInfoRows(timing, mrrVal, mrrStatus, hasModelRefs, userTotal, shipTotal);
     html = strrep(html, '{{MODEL_INFO_ROWS}}', modelInfoHtml);
 
     % Phase table
@@ -65,11 +67,49 @@ function generateInitProfilingReport(dataDir, outFile)
     % Flamegraph data (profiler user code)
     html = strrep(html, '{{PROFILER_FLAMEGRAPH_DATA}}', profilerFlamegraphJson);
 
-    % Date
+    % Section severity badges (based on absolute time thresholds)
+    maxPhaseDur = max(cellfun(@(p) p.duration, phases));
+    if maxPhaseDur >= 5
+        html = strrep(html, '{{PHASE_BADGE}}', '<span class="badge badge-red">Critical</span>');
+    else
+        html = strrep(html, '{{PHASE_BADGE}}', '<span class="badge badge-green">OK</span>');
+    end
+    if userTotal >= 5
+        html = strrep(html, '{{USER_BADGE}}', '<span class="badge badge-red">Critical</span>');
+    elseif userTotal >= 1
+        html = strrep(html, '{{USER_BADGE}}', '<span class="badge badge-yellow">Warning</span>');
+    else
+        html = strrep(html, '{{USER_BADGE}}', '<span class="badge badge-green">OK</span>');
+    end
+    if shipTotal >= 30
+        html = strrep(html, '{{SHIP_BADGE}}', '<span class="badge badge-yellow">Warning</span>');
+    else
+        html = strrep(html, '{{SHIP_BADGE}}', '<span class="badge badge-green">OK</span>');
+    end
+
+    % Date, model name, and error section
     html = strrep(html, '{{DATE}}', char(datetime("now", 'Format', 'yyyy-MM-dd HH:mm:ss')));
+    html = strrep(html, '{{MODEL_NAME}}', modelName);
+    if ~isempty(errorMsg)
+        errorMsg = regexprep(errorMsg, '<a[^>]*>', '');
+        errorMsg = strrep(errorMsg, '</a>', '');
+        errorHtml = sprintf([ ...
+            '<div class="card" style="border-left:4px solid var(--red); background:var(--red-bg); margin-bottom:1.5rem;">\n' ...
+            '<h3 style="color:var(--red); margin-bottom:0.5rem;">Simulation Error</h3>\n' ...
+            '<p>The simulation encountered an error during execution. Profiling data may be incomplete.</p>\n' ...
+            '<pre style="background:#fff; border:1px solid var(--border); border-radius:4px; padding:0.75rem; margin-top:0.5rem; white-space:pre-wrap; font-size:0.85rem;">%s</pre>\n' ...
+            '</div>'], htmlEscape(errorMsg));
+    else
+        errorHtml = '';
+    end
+    html = strrep(html, '{{ERROR_SECTION}}', errorHtml);
 
     % ModelRefRebuild section
-    mrrHtml = buildMrrSection(mrrVal, mrrStatus);
+    if hasModelRefs
+        mrrHtml = buildMrrSection(mrrVal, mrrStatus);
+    else
+        mrrHtml = '';
+    end
     html = strrep(html, '{{MRR_SECTION}}', mrrHtml);
 
     % Save
@@ -82,65 +122,43 @@ function generateInitProfilingReport(dataDir, outFile)
     fprintf('Report saved to: %s\n', outFile);
 end
 
-%% --- ModelRefRebuild parser ---
-function [val, status] = parseModelRefRebuild(diaryFile)
-    val = '(unknown)';
-    status = 'warning';
-    if ~isfile(diaryFile)
-        status = 'notfound';
-        return;
-    end
-    txt = fileread(diaryFile);
-    lines = splitlines(txt);
-    validValues = {'Force', 'IfOutOfDateOrStructuralChange', 'IfOutOfDate', 'AssumeUpToDate'};
-
-    for i = 1:numel(lines)
-        if contains(lines{i}, 'ModelRefRebuild')
-            for j = 1:2
-                if i + j <= numel(lines)
-                    candidate = strtrim(lines{i+j});
-                    candidate = strrep(candidate, '''', '');
-                    if ismember(candidate, validValues)
-                        val = candidate;
-                        break;
-                    end
-                end
-            end
-            break;
+%% --- Model reference info parser ---
+function [val, status, hasModelRefs] = parseModelRefInfo(dataDir)
+    matFile = fullfile(dataDir, 'modelRefInfo.mat');
+    if isfile(matFile)
+        S = load(matFile, 'modelInfo');
+        hasModelRefs = S.modelInfo.hasModelRefs;
+        if isfield(S.modelInfo, 'modelRefRebuild')
+            val = S.modelInfo.modelRefRebuild;
+        else
+            val = '(unknown)';
         end
+    else
+        % Old data without modelRefInfo.mat — assume true for safety
+        hasModelRefs = true;
+        val = '(unknown)';
     end
 
     if strcmp(val, 'IfOutOfDate')
         status = 'ok';
     elseif strcmp(val, 'AssumeUpToDate')
         status = 'info';
+    elseif strcmp(val, '(unknown)')
+        status = 'warning';
     else
         status = 'warning';
     end
 end
 
 %% --- HTML builders ---
-function s = buildSummaryItems(timing, userTotal, shipTotal)
+function s = buildModelInfoRows(timing, mrrVal, mrrStatus, hasModelRefs, userTotal, shipTotal)
     grandTotal = userTotal + shipTotal;
-    s = sprintf([ ...
-        '<div class="summary-item"><div class="value" style="color:var(--red);">%.1f s</div><div class="label">Initialization Time</div></div>\n' ...
-        '<div class="summary-item"><div class="value">%.1f s</div><div class="label">Execution Time</div></div>\n' ...
-        '<div class="summary-item"><div class="value">%.1f s</div><div class="label">Termination Time</div></div>\n' ...
-        '<div class="summary-item"><div class="value" style="color:var(--red);">%.1f s</div><div class="label">Total Wall Time</div></div>\n' ...
-        '<div class="summary-item"><div class="value" style="color:var(--yellow);">%.1f%%</div><div class="label">User Code Self-Time</div></div>\n' ...
-        '<div class="summary-item"><div class="value">%.1f%%</div><div class="label">Shipping Code Self-Time</div></div>\n'], ...
-        timing.init, timing.exec, timing.term, timing.total, ...
-        userTotal/grandTotal*100, shipTotal/grandTotal*100);
-end
-
-function s = buildModelInfoRows(timing, mrrVal, mrrStatus)
-    switch mrrStatus
-        case 'ok'
-            mrrBadge = '<span class="badge badge-green">OK</span>';
-        case 'info'
-            mrrBadge = '<span class="badge badge-blue">Info</span>';
-        otherwise
-            mrrBadge = '<span class="badge badge-red">Warning</span>';
+    if grandTotal > 0
+        userPct = userTotal / grandTotal * 100;
+        shipPct = shipTotal / grandTotal * 100;
+    else
+        userPct = 0;
+        shipPct = 0;
     end
     s = sprintf([ ...
         '<tr><td>Profiling Date</td><td>%s → %s</td></tr>\n' ...
@@ -148,13 +166,26 @@ function s = buildModelInfoRows(timing, mrrVal, mrrStatus)
         '<tr><td>Initialization</td><td>%.2f s (%.1f%%)</td></tr>\n' ...
         '<tr><td>Execution</td><td>%.2f s (%.1f%%)</td></tr>\n' ...
         '<tr><td>Termination</td><td>%.2f s (%.1f%%)</td></tr>\n' ...
-        '<tr><td>ModelRefRebuild</td><td>%s <code>%s</code></td></tr>\n'], ...
+        '<tr><td>MATLAB Code: User</td><td>%.3f s (%.1f%%)</td></tr>\n' ...
+        '<tr><td>MATLAB Code: MathWorks</td><td>%.3f s (%.1f%%)</td></tr>\n'], ...
         timing.tstart, timing.tstop, ...
         timing.total, ...
         timing.init, timing.init/timing.total*100, ...
         timing.exec, timing.exec/timing.total*100, ...
         timing.term, timing.term/timing.total*100, ...
-        mrrBadge, mrrVal);
+        userTotal, userPct, ...
+        shipTotal, shipPct);
+    if hasModelRefs
+        switch mrrStatus
+            case 'ok'
+                mrrBadge = '<span class="badge badge-green">OK</span>';
+            case 'info'
+                mrrBadge = '<span class="badge badge-blue">Info</span>';
+            otherwise
+                mrrBadge = '<span class="badge badge-red">Warning</span>';
+        end
+        s = [s, sprintf('<tr><td>ModelRefRebuild</td><td>%s <code>%s</code></td></tr>\n', mrrBadge, mrrVal)];
+    end
 end
 
 function s = buildPhaseTable(phases, totalWall)
@@ -189,17 +220,99 @@ end
 function s = buildMrrSection(val, status)
     switch status
         case 'ok'
-            s = '<div class="card" style="border-left:4px solid var(--green);"><p><strong>IfOutOfDate</strong> — This is the recommended setting. Only rebuilds when dependencies change.</p></div>';
+            heading = '<h2><span class="badge badge-green">OK</span> ModelRefRebuild Setting</h2>';
+            body = '<div class="card" style="border-left:4px solid var(--green);"><p><strong>IfOutOfDate</strong> — This is the recommended setting. Only rebuilds when dependencies change.</p></div>';
         case 'info'
-            s = '<div class="card" style="border-left:4px solid var(--blue);"><p><strong>AssumeUpToDate</strong> — Skips all rebuild checks. Fast, but risks using stale targets. Use only when certain no dependencies have changed.</p></div>';
+            heading = '<h2><span class="badge badge-blue">Info</span> ModelRefRebuild Setting</h2>';
+            body = '<div class="card" style="border-left:4px solid var(--blue);"><p><strong>AssumeUpToDate</strong> — Skips all rebuild checks. Fast, but risks using stale targets. Use only when certain no dependencies have changed.</p></div>';
         otherwise
-            s = sprintf([ ...
+            heading = '<h2><span class="badge badge-yellow">Warning</span> ModelRefRebuild Setting</h2>';
+            body = sprintf([ ...
                 '<div class="card" style="border-left:4px solid var(--red);">' ...
                 '<p><strong>%s</strong> — This may cause unnecessary rebuilds and slow initialization.</p>' ...
                 '<p><strong>Recommendation:</strong> Change to <code>IfOutOfDate</code>:</p>' ...
                 '<p><code>set_param(mdl, ''UpdateModelReferenceTargets'', ''IfOutOfDate'')</code></p>' ...
                 '<p>UI: Model Settings → Model Referencing → Rebuild → "If changes in known dependencies detected"</p>' ...
                 '</div>'], htmlEscape(val));
+    end
+    s = [heading, newline, body];
+end
+
+function s = buildFindingsSection(timing, phases, perfTotalWall, userFuncs, userTotal, shipTotal, mrrVal, mrrStatus, hasModelRefs)
+    items = {};
+    grandTotal = userTotal + shipTotal;
+
+    % 1. Initialization dominance
+    initPct = timing.init / timing.total * 100;
+    if initPct > 90
+        items{end+1} = sprintf('<span class="badge badge-blue">Info</span> Initialization accounts for %.0f%% of total wall time &mdash; this is expected for a StopTime=0 profiling run.', initPct);
+    end
+
+    % 2. Top compile phases (>5% of total, but only flag if absolute time is significant)
+    durations = cellfun(@(p) p.duration, phases);
+    [~, order] = sort(durations, 'descend');
+    phaseCount = 0;
+    for k = 1:numel(order)
+        p = phases{order(k)};
+        pct = p.duration / perfTotalWall * 100;
+        if pct >= 5 && p.duration >= 5
+            phaseCount = phaseCount + 1;
+            if phaseCount == 1
+                items{end+1} = sprintf('<span class="badge badge-red">Critical</span> Phase &lsquo;%s&rsquo; is the largest compile phase at %.1fs (%.0f%% of total).', htmlEscape(p.phase), p.duration, pct); %#ok<AGROW>
+            else
+                items{end+1} = sprintf('<span class="badge badge-yellow">Warning</span> Phase &lsquo;%s&rsquo; consumes %.1fs (%.0f%% of total).', htmlEscape(p.phase), p.duration, pct); %#ok<AGROW>
+            end
+            if phaseCount >= 3, break; end
+        end
+    end
+
+    % 3. User code hot spots (only flag if user code time is significant)
+    if userTotal > 5.0 && ~isempty(userFuncs)
+        nShow = min(3, numel(userFuncs));
+        for k = 1:nShow
+            f = userFuncs(k);
+            if f.selfTime >= 1.0
+                items{end+1} = sprintf('<span class="badge badge-yellow">Warning</span> User callback &lsquo;%s&rsquo; consumes %.1fs of self-time (%d calls). Consider optimizing or caching results.', htmlEscape(f.name), f.selfTime, f.numCalls); %#ok<AGROW>
+            end
+        end
+    end
+
+    % 4. User vs shipping split (only flag if absolute time is significant)
+    if grandTotal > 0
+        userPct = userTotal / grandTotal * 100;
+        if userPct > 30 && userTotal > 5.0
+            items{end+1} = sprintf('<span class="badge badge-red">Critical</span> User code accounts for %.0f%% of profiled self-time &mdash; significant optimization potential exists in user callbacks and scripts.', userPct);
+        elseif userPct < 10
+            items{end+1} = sprintf('<span class="badge badge-blue">Info</span> User code accounts for only %.0f%% of self-time &mdash; most time is spent in MathWorks shipping code.', userPct);
+        end
+    end
+
+    % 5. ModelRefRebuild warning
+    if hasModelRefs && strcmp(mrrStatus, 'warning')
+        items{end+1} = sprintf('<span class="badge badge-yellow">Warning</span> ModelRefRebuild is set to &lsquo;%s&rsquo; which may cause unnecessary rebuilds. Change to <code>IfOutOfDate</code>.', htmlEscape(mrrVal));
+    end
+
+    % 6. All green — no significant issues found
+    hasIssues = any(cellfun(@(x) contains(x, 'badge-red') || contains(x, 'badge-yellow'), items));
+    if ~hasIssues
+        items{end+1} = sprintf('<span class="badge badge-green">OK</span> Initialization completed in %.1fs with no significant bottlenecks detected.', timing.init);
+    end
+
+    % Build HTML
+    if isempty(items)
+        s = '';
+    else
+        liItems = '';
+        for k = 1:numel(items)
+            liItems = [liItems, sprintf('    <li style="margin-bottom:0.6rem;">%s</li>\n', items{k})]; %#ok<AGROW>
+        end
+        s = sprintf([ ...
+            '<h2>Findings &amp; Recommendations</h2>\n' ...
+            '<div class="card">\n' ...
+            '  <ol style="margin:0.5rem 0 0.5rem 1.5rem;">\n' ...
+            '%s' ...
+            '  </ol>\n' ...
+            '</div>\n'], liItems);
     end
 end
 
@@ -217,10 +330,11 @@ function json = buildProfilerFlamegraph(matFile)
     mr = matlabroot;
     N = length(ft);
 
-    % Classify shipping vs user
+    % Classify shipping vs user (treat profiling harness as shipping)
     isShipping = false(N, 1);
     for i = 1:N
-        isShipping(i) = startsWith(ft(i).FileName, mr, 'IgnoreCase', true) || isempty(ft(i).FileName);
+        isHarness = strcmp(ft(i).FunctionName, 'collectInitProfiling');
+        isShipping(i) = isHarness || startsWith(ft(i).FileName, mr, 'IgnoreCase', true) || isempty(ft(i).FileName);
     end
 
     % Find root: entry with no parents

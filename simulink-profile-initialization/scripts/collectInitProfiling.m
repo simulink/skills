@@ -16,9 +16,20 @@ function collectInitProfiling(mdl)
         mdl = bdroot;
     end
 
+    % Detect model references before profiling
+    [~, mdlRefs] = find_mdlrefs(mdl, 'ReturnTopModelAsLastElement', false);
+    hasModelRefs = ~isempty(mdlRefs);
+    modelInfo.hasModelRefs = hasModelRefs;
+    modelInfo.modelRefRebuild = get_param(mdl, 'UpdateModelReferenceTargets');
+    save modelRefInfo modelInfo
+
     PerfTools.Tracer.enable('All Simulink Compile', true);
     PerfTools.Tracer.clearRawData();
     profile on -historysize 50000000
+    diary off
+    if isfile('modelCompileDiary.txt')
+        delete('modelCompileDiary.txt');
+    end
     diary modelCompileDiary.txt
     ModelRefRebuild = get_param(mdl, 'UpdateModelReferenceTargets') %#ok<NOPRT>
     out = sim(mdl, 'StopTime', '0', 'CaptureErrors', 'on');
@@ -29,5 +40,5 @@ function collectInitProfiling(mdl)
     save out_after out
     PerfTools.Tracer.enable('All Simulink Compile', false);
     zip(['PerfData-' char(datetime("now", 'Format', "uuuuMMdd'T'HHmmss")) '.zip'], ...
-        {'out_after.mat', 'perfTracer.mat', 'profilerResults.mat', 'modelCompileDiary.txt'});
+        {'out_after.mat', 'perfTracer.mat', 'profilerResults.mat', 'modelCompileDiary.txt', 'modelRefInfo.mat'});
 end

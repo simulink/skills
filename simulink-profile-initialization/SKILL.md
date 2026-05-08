@@ -89,6 +89,8 @@ This computes self time (TotalTime minus children time) for each function, separ
 
 ### Step 5 — Check ModelRefRebuild setting (modelCompileDiary.txt)
 
+This step is only relevant when the model uses Model Reference blocks. The profiling harness automatically detects whether the model references other models. If it does not, skip this step.
+
 Run the `checkModelRefRebuild` script:
 
 ```matlab
@@ -112,11 +114,12 @@ generateInitProfilingReport('path/to/data', 'report.html')  % specify output pat
 
 This produces a self-contained HTML file with:
 - Summary dashboard (init time, execution time, user vs shipping code split)
+- Findings & Recommendations (auto-generated insights with severity badges)
 - Interactive compile-phase flamegraph (click to zoom, breadcrumb navigation)
 - Interactive user-code call tree flamegraph (MathWorks shipping code collapsed)
 - Phase table sorted by duration
 - User code and shipping code profiler tables
-- ModelRefRebuild setting status
+- ModelRefRebuild setting status (only when model uses Model Reference blocks)
 
 To generate only a standalone flamegraph from Performance Tracer data:
 
@@ -133,7 +136,7 @@ Present a structured summary with:
 2. **Phase breakdown** from Performance Tracer (top phases by duration)
 3. **Shipping vs user code split** (percentage of self-time in each category)
 4. **User-actionable bottlenecks** (top user-code functions by self time, with call counts)
-5. **ModelRefRebuild setting** check (flag if not `'IfOutOfDate'`)
+5. **ModelRefRebuild setting** check (only if the model uses Model Reference blocks; flag if not `'IfOutOfDate'`)
 6. **Recommendations** prioritized by potential time savings
 
 Focus recommendations on what the user can actually change. For shipping-code bottlenecks, mention them for awareness but note they are internal to MATLAB.
