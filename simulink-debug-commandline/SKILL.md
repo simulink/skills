@@ -94,7 +94,3 @@ Use the **`simulink-solver-profiler-analyzer`** skill first to identify problema
 - **`tbreak` is a toggle** — run `tbreak T` again to disable it. Use `status` to verify active breakpoints.
 - **Multi-rate models** — blocks in different rate groups have different task indices; verify with `slist`.
 - **Do NOT use `emode`** — legacy command.
-
-## See Also
-
-- **simulink-debug-in-editor** — Graphical in-editor breakpoints via `set_param` on port handles. Use for conditional breakpoints on signal values (pause when output > X) with the Play button.
