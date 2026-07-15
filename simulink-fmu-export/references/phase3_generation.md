@@ -15,16 +15,22 @@
 - Multi-instance: `'SupportMultiInstance', 'on'` (NOT `'MultiInstance'`)
 - FMU state: `'EnableFMUState', 'on'` (NOT `'canGetAndSetFMUState'`)
 
-Run the bundled export script via:
-```bash
-rm -r /tmp/slprj 2>/dev/null; mw matlab -batch "addpath('<SKILL_DIR>/scripts'); export_fmu('<ABSOLUTE_PATH_TO_SLX>', '/tmp/fmu_output', 'ks=1; kt=1;', 'FMIVersion', '2.0', 'FMUType', 'CS', 'SaveSourceCodeToFMU', 'on')"
+Run the bundled export script using the MATLAB MCP server's `eval_matlab` tool with the following `code` parameter:
+```matlab
+addpath('<SKILL_DIR>/scripts');
+export_fmu('<ABSOLUTE_PATH_TO_SLX>', '/tmp/fmu_output', 'ks=1; kt=1;', 'FMIVersion', '2.0', 'FMUType', 'CS', 'SaveSourceCodeToFMU', 'on');
 ```
+> If the MATLAB MCP server is not available, execute this via shell command:
+> `matlab -batch "addpath('<SKILL_DIR>/scripts'); export_fmu('<ABSOLUTE_PATH_TO_SLX>', '/tmp/fmu_output', 'ks=1; kt=1;', 'FMIVersion', '2.0', 'FMUType', 'CS', 'SaveSourceCodeToFMU', 'on')"`
 
-This can take 1-5 minutes. Run it and monitor output.
+This can take 1-5 minutes. Monitor the output.
 
 ### Using a Build Config File
 
 Instead of specifying all options inline, users can load settings from a previously saved JSON config (`FMUBuildConfigFile`), or save the current setup (`SaveCurrentFMUBuildConfig`):
-```bash
-mw matlab -batch "addpath('<SKILL_DIR>/scripts'); export_fmu('<ABSOLUTE_PATH_TO_SLX>', '/tmp/fmu_output', '', 'FMUBuildConfigFile', '/path/to/config.json')"
+```matlab
+addpath('<SKILL_DIR>/scripts');
+export_fmu('<ABSOLUTE_PATH_TO_SLX>', '/tmp/fmu_output', '', 'FMUBuildConfigFile', '/path/to/config.json');
 ```
+> If the MATLAB MCP server is not available, execute this via shell command:
+> `matlab -batch "addpath('<SKILL_DIR>/scripts'); export_fmu('<ABSOLUTE_PATH_TO_SLX>', '/tmp/fmu_output', '', 'FMUBuildConfigFile', '/path/to/config.json')"`

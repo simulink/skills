@@ -17,12 +17,14 @@ unzip -l <output_dir>/<fmu_name>.fmu | head -30
 3. **Select validation approach**: Automatically validate using Option A (if a harness was generated) or Option B (if no harness exists), unless the user specified a different preference or asked to skip.
 
 ### Option A: Simulink Test Harness
-If `CreateModelAfterGeneratingFMU` was enabled:
+If `CreateModelAfterGeneratingFMU` was enabled, use the MATLAB MCP server's `eval_matlab` tool:
 ```matlab
 cd('<output_dir>');
 open_system('<model>_harness');
 sim('<model>_harness');
 ```
+> If the MATLAB MCP server is not available, execute this via shell command:
+> `matlab -batch "cd('<output_dir>'); load_system('<model>_harness'); sim('<model>_harness');"`
 
 ### Option B: fmusim (Recommended)
 
