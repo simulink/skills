@@ -9,6 +9,18 @@ Skills in this repository are designed to work with the [Simulink Agentic Toolki
 
 ## Skills
 
+### `simulink-debug-commandline`
+
+Debug Simulink simulation results at the engine method level using the command-line debugger (`sldebug`). Steps through individual block methods (Outputs, Update, Derivatives, InitializeConditions, Enable, Disable) to pinpoint exactly why a block produces an unexpected value at a specific time step.
+
+**Triggers on:** "output is wrong at this time step", "block produces unexpected value", "state resets unexpectedly", "debug block execution", "what happens at t=X", "step through the simulation loop", "use sldebug", "probe block data", "trace block I/O", "debug block methods".
+
+### `simulink-fmu-export`
+
+Export a Simulink model to FMU (Functional Mock-Up Unit). Automates the workflow from model inspection and FMI configuration to FMU generation, error analysis, and post-export validation.
+
+**Triggers on:** "Export my ac_motor model to FMU.", "Convert the Simulink model in this folder to an FMU file.", "Generate an FMU from the vehicle dynamics model."
+
 ### `simulink-interactions`
 
 Interact with a Simulink model that is already open in MATLAB — inspect blocks, change parameters, add and connect blocks, log signals, and create subsystems.
@@ -20,12 +32,6 @@ Key conventions enforced:
 - Use `Simulink.connectBlocks` instead of `add_line`
 - Position blocks with bundled `setBlockPosition` / `setBlockDimensions` utilities — never raw `'Position'` vectors
 - Log signals via port handles — never To Workspace blocks
-
-### `simulink-debug-commandline`
-
-Debug Simulink simulation results at the engine method level using the command-line debugger (`sldebug`). Steps through individual block methods (Outputs, Update, Derivatives, InitializeConditions, Enable, Disable) to pinpoint exactly why a block produces an unexpected value at a specific time step.
-
-**Triggers on:** "output is wrong at this time step", "block produces unexpected value", "state resets unexpectedly", "debug block execution", "what happens at t=X", "step through the simulation loop", "use sldebug", "probe block data", "trace block I/O", "debug block methods".
 
 ### Profiling Skills
 
