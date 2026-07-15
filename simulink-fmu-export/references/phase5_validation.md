@@ -28,7 +28,7 @@ sim('<model>_harness');
 
 ### Option B: fmusim (Recommended)
 
-fmusim is a standalone CLI tool from the Reference-FMUs project. **PyPI/pip is blocked on MathWorks internal network**, so use fmusim instead of FMPy.
+fmusim is a standalone CLI tool from the Reference-FMUs project. **If PyPI/pip is blocked on your network**, use fmusim instead of FMPy.
 
 **Download and setup** (one-time, Linux only):
 ```bash
@@ -66,7 +66,7 @@ Then pass `--input-file /tmp/fmu_input.csv`.
 
 ### Option C: FMPy (Python)
 
-**NOTE**: PyPI is typically blocked on internal networks (403 Forbidden). Only offer this if the user has external network access or a pre-installed FMPy.
+**NOTE**: If PyPI is blocked on your network (e.g., 403 Forbidden), only offer this if the user has external network access or a pre-installed FMPy.
 
 ```bash
 python3 -m pip install fmpy --user
